@@ -30,6 +30,28 @@ services:
       nofile:
         soft: 262144
         hard: 262144
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O-", "http://localhost:8123/ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  clickhouse-init:
+    image: clickhouse/clickhouse-server:latest
+    container_name: leaderboard_clickhouse_init
+    depends_on:
+      clickhouse:
+        condition: service_healthy
+    volumes:
+      - ./clickhouse/init-views.sql:/init/init-views.sql:ro
+    user: root
+    entrypoint:
+      - /bin/sh
+      - -c
+      - |
+        sleep 2
+        clickhouse-client --host clickhouse --port 9000 --user analytics_user --password analytics_password --database livepeer_analytics --multiquery < /init/init-views.sql
+        echo "ClickHouse views initialized"
 
 volumes:
   clickhouse_data: {}
