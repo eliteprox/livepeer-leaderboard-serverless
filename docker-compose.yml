@@ -1,7 +1,6 @@
-
 services:
   postgres:
-    image: postgres:latest
+    image: postgres:17
     container_name: leaderboard_postgres
     restart: always
     environment:
@@ -12,3 +11,25 @@ services:
       - "5432:5432"
     volumes:
       - ./data/:/var/lib/postgresql/data
+
+  clickhouse:
+    image: clickhouse/clickhouse-server:latest
+    container_name: leaderboard_clickhouse
+    restart: always
+    ports:
+      - "8123:8123"
+      - "9000:9000"
+    environment:
+      CLICKHOUSE_DB: livepeer_analytics
+      CLICKHOUSE_USER: analytics_user
+      CLICKHOUSE_PASSWORD: analytics_password
+      CLICKHOUSE_DEFAULT_ACCESS_MANAGEMENT: 1
+    volumes:
+      - clickhouse_data:/var/lib/clickhouse
+    ulimits:
+      nofile:
+        soft: 262144
+        hard: 262144
+
+volumes:
+  clickhouse_data: {}

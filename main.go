@@ -3,6 +3,7 @@ package main
 import (
 	"net/http"
 
+	"github.com/joho/godotenv"
 	handler "github.com/livepeer/leaderboard-serverless/api"
 	"github.com/livepeer/leaderboard-serverless/common"
 	"github.com/livepeer/leaderboard-serverless/metrics"
@@ -11,6 +12,7 @@ import (
 // this func is for running in local mode.  Vercel does not use this as an entrypoint
 // so any logic here should only reflect what is needed for local development
 func main() {
+	_ = godotenv.Load()
 
 	// Explicit ClickHouse init for local mode.
 	// Vercel handlers use metrics.CacheCH() lazily per-request instead.
